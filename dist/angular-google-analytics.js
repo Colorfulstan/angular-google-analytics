@@ -1,11 +1,3 @@
-/**
- * Angular Google Analytics - Easy tracking for your AngularJS application
- * @version v1.1.7 - 2016-03-25
- * @link http://github.com/revolunet/angular-google-analytics
- * @author Julien Bouquillon <julien@revolunet.com> (https://github.com/revolunet)
- * @contributors Julien Bouquillon (https://github.com/revolunet),Justin Saunders (https://github.com/justinsa),Chris Esplin (https://github.com/deltaepsilon),Adam Misiorny (https://github.com/adam187)
- * @license MIT License, http://www.opensource.org/licenses/MIT
- */
 /* globals define */
 (function (root, factory) {
   'use strict';
@@ -41,6 +33,7 @@
           hybridMobileSupport = false,
           offlineMode = false,
           pageEvent = '$routeChangeSuccess',
+          useUIRouterTransition = false,
           readFromRoute = false,
           removeRegExp,
           testMode = false,
@@ -113,6 +106,11 @@
 
       this.setPageEvent = function (name) {
         pageEvent = name;
+        return this;
+      };
+
+      this.useUIRouterTransition = function (bool) {
+        useUIRouterTransition = bool;
         return this;
       };
 
@@ -206,7 +204,7 @@
       this.$get = ['$document', // To read title 
                    '$location', // 
                    '$log',      //
-                   '$rootScope',// 
+                   '$rootScope',//
                    '$window',   //
                    '$injector', // To access ngRoute module without declaring a fixed dependency
                    function ($document, $location, $log, $rootScope, $window, $injector) {
@@ -1091,7 +1089,7 @@
 
         // activates page tracking
         if (trackRoutes) {
-          $rootScope.$on(pageEvent, function () {
+          var trackingFn = function () {
             // Apply $route based filtering if configured
             if (readFromRoute) {
               // Avoid tracking undefined routes, routes without template (e.g. redirect routes)
@@ -1100,9 +1098,15 @@
                 return;
               }
             }
-            
+
             that._trackPage();
-          });
+          }
+
+          if (useUIRouterTransition){
+            $injector.get('$transitions').onSuccess({}, trackingFn.bind(this))
+          } else {
+            $rootScope.$on(pageEvent, trackingFn.bind(this));
+          }
         }
 
         return {
@@ -1127,6 +1131,7 @@
             ignoreFirstPageLoad: ignoreFirstPageLoad,
             logAllCalls: logAllCalls,
             pageEvent: pageEvent,
+            useUIRouterTransition: useUIRouterTransition,
             readFromRoute: readFromRoute,
             removeRegExp: removeRegExp,
             testMode: testMode,
