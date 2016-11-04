@@ -45,8 +45,12 @@ module.exports = function (config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['spec', 'notify'],
+		reporters: ['mocha', 'notify'],
 
+		mochaReporter: {
+			output: 'autowatch',
+			showDiff: 'unified'
+		},
 		notifyReporter: {
 			reportEachFailure: true, // Default: false, Will notify on every failed sepc
 			reportSuccess: false, // Default: true, Will notify when a suite was successful
@@ -74,7 +78,7 @@ module.exports = function (config) {
 			'karma-coverage',
 			'karma-browserify',
 			'karma-chrome-launcher',
-			'karma-spec-reporter',
+			'karma-mocha-reporter',
 			'karma-notify-reporter'
 		],
 
