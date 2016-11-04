@@ -1,3 +1,52 @@
+## This is my personal Monkey-business not affiliated to the original Project, use at your own risk.
+
+Since I just need some of the functionalities to work with angular 2 and that fast I did a quick and dirty angular2 / TS / ES6 migration.
+Besides the concept of how to be able to configure the service-provider no thought went into this whatsoever and it is
+basically just a 1 to 1 port of the angular 1 version.
+
+Router-specific code was not ported, so readFromRoute and similar things will most likely not work yet, so only
+router-agnostic logic has been ported.
+
+Tests might get migrated soon to ensure functionality, but also might not.
+
+### If you insist on using it:
+
+you need a typescript (+ babel) setup or add some pre-compilation for the files within /ng2
+Also currently you need to copy the respective files into your project (maybe this is just for my own setup, but i can't use them out of my node_modules folder yet.)
+
+```
+[...]
+import {Analytics, ANALYTICS_CONFIGURATION_PROVIDER, ANALYTICS_CONFIGURATION} from 'angular-google-analytics/ng2/index'
+
+// either configure by using the methods of ANALYTICS_CONFIGURATION_PROVIDER:
+ANALYTICS_CONFIGURATION_PROVIDER.setAccount(...)
+
+// or configure by setting values on ANALYTICS_CONFIGURATION directly
+ANALYTICS_CONFIGURATION.offlineMode = true
+
+// provide the service and the configuration to your module
+@NgModule({
+	providers: [
+		Analytics,
+		{provide: ANALYTICS_CONFIGURATION_PROVIDER, useValue: ANALYTICS_CONFIGURATION}
+	]
+})
+export class AppModule{
+	// setup page-tracking with e.g. ui-router-ng2
+	constructor(private transitionService: TransitionService, private analytics: Analytics){
+		transitionService.onSuccess(()=>{
+			analytics.trackPage()
+		})
+	}
+
+}
+
+// inject the service
+[...]
+constructor(private analytics: Analytics){
+}
+```
+
 # angular-google-analytics
 
 [![Bower Version](https://img.shields.io/bower/v/angular-google-analytics.svg)](https://github.com/revolunet/angular-google-analytics)
